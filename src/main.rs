@@ -64,43 +64,74 @@ fn main() -> Result<()> {
 
                     let key = "PATH";
                     let mut result_path = String::new();
+                    // let mut this_time_found = false;
+                    let mut founded = Vec::new();
                     match env::var_os(key) {
                         Some(paths) => {
-                            for path in env::split_paths(&paths) {
-                                if path.is_dir() {
-                                    for entry in std::fs::read_dir(path)? {
-                                        // let entry = entry?;
-                                        let path = entry.as_ref().unwrap().path();
-                                        arguments_vec[1..].iter().for_each(|file| {
+                            arguments_vec[1..].iter().for_each(|file| {
+                                for path in env::split_paths(&paths) {
+                                    if path.is_dir() {
+                                        for entry in std::fs::read_dir(path).unwrap() {
+                                            // let entry = entry?;
+                                            let path = entry.as_ref().unwrap().path();
                                             if path.file_name().unwrap().to_str().unwrap()
                                                 == file.as_str().trim()
                                             {
                                                 result_path.push_str(file.as_str().trim());
                                                 result_path.push_str(" is ");
                                                 result_path.push_str(path.to_str().unwrap());
+                                                result_path.push_str("\n");
 
                                                 // println!(
                                                 //     "{} is {}",
                                                 //     file.as_str().trim(),
                                                 //     path.to_str().unwrap()
                                                 // );
+                                                // this_time_found = true;
+                                                // println!("{}", this_time_found);
+                                                founded.push(file.as_str().trim());
                                             } else {
-                                                println!("{} not found", file.as_str().trim());
-                                                // uncommant
+                                                // println!("{} not found", file.as_str().trim());
+                                                // println!("{}", this_time_found);
+                                                // this_time_found = false;
                                             }
-                                        })
+                                        }
                                     }
-                                }
-                            }
+                                } // down
+
+                                // if this_time_found == false {
+                                //     println!("{} not found-----", file.as_str().trim());
+                                // } else {
+                                //     println!("{}", result_path);
+                                // } ////////
+                                // match result_path.as_str() {
+                                //     "" => println!("{} not found", file.as_str().trim()),
+                                //     _ => println!("{}", result_path),
+                                // }
+                            }); //
+                                // arguments_vec[1..].iter().for_each(|file| {
+                                //     for (i, e) in founded.iter() {
+                                //         if file.as_str().trim() == e.trim() {
+                                //             // println!("{} not found-----", file.as_str().trim());
+                                //         } else {
+                                //             println!("{} not found-----", file.as_str().trim());
+                                //         }
+                                //     }
+                                // });
+                                // arguments_vec.iter().filter()
+
+                            println!("{}", result_path);
+                            println!("{:?}", founded);
+                            println!("{:?}", arguments_vec);
                         }
 
                         None => println!("{key} is not defined in the environment."),
                     }
                     // println!("{:?}", result_path);
-                    match result_path.as_str() {
-                        "" => println!("{} not found", arguments_vec[1].trim()),
-                        _ => println!("{}", result_path),
-                    }
+                    // match result_path.as_str() {
+                    //     "" => println!("{} not found", arguments_vec[1].trim()),
+                    //     _ => println!("{}", result_path),
+                    // }
                 } else if arguments_vec.len() == 1 {
                     println!();
                 }

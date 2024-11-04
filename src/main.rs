@@ -66,6 +66,8 @@ fn main() -> Result<()> {
                     let mut result_path = String::new();
                     // let mut this_time_found = false;
                     let mut founded = Vec::new();
+                    let mut not_found_bool = Vec::new();
+                    // let mut not_found = Vec::new();
                     match env::var_os(key) {
                         Some(paths) => {
                             arguments_vec[1..].iter().for_each(|file| {
@@ -109,20 +111,38 @@ fn main() -> Result<()> {
                                 //     _ => println!("{}", result_path),
                                 // }
                             }); //
-                                // arguments_vec[1..].iter().for_each(|file| {
-                                //     for (i, e) in founded.iter() {
-                                //         if file.as_str().trim() == e.trim() {
-                                //             // println!("{} not found-----", file.as_str().trim());
-                                //         } else {
-                                //             println!("{} not found-----", file.as_str().trim());
-                                //         }
+                            arguments_vec[1..].iter().for_each(|file| {
+                                // for (i, e) in founded.iter() {
+                                //     if file.as_str().trim() == e.trim() {
+                                //         // println!("{} not found-----", file.as_str().trim());
+                                //     } else {
+                                //         println!("{} not found-----", file.as_str().trim());
                                 //     }
-                                // });
-                                // arguments_vec.iter().filter()
+                                // }
+                                founded.iter().for_each(|e| {
+                                    // for (i, e) in founded.iter().enumerate() {
+                                    if file.as_str().trim() != *e {
+                                        not_found_bool.push(true);
+                                        // break;
+                                    } else {
+                                        not_found_bool.push(false);
+                                    }
+                                    // }
+                                });
+                                let truee = not_found_bool.iter().all(|e| *e == true);
+                                if truee == true {
+                                    println!("{} not found", file.as_str().trim());
+                                }
+                                not_found_bool.clear();
+                                // let some = founded.iter().filter(|e| file.as_str().trim() != **e);
+                                // println!("{:?}", some);
+                            });
+                            // arguments_vec.iter().filter()
 
                             println!("{}", result_path);
-                            println!("{:?}", founded);
-                            println!("{:?}", arguments_vec);
+                            // println!("{:?}", arguments_vec);
+                            // println!("{:?}", founded);
+                            // println!("{:?}", not_found_bool);
                         }
 
                         None => println!("{key} is not defined in the environment."),

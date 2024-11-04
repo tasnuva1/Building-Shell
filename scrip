@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cargo run --quiet
+sleep 4 
+type cat lsfjl eeeoo lf oooooo
+

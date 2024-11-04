@@ -41,33 +41,33 @@ fn main() -> Result<()> {
                         stdout.write(e.as_bytes()).context("stdout write error");
                         stdout.write(b" ").context("stdout write error");
                     });
-                    // stdout.write_all(b"some bytes").unwrap();
-                    // println!("{:?}", arguments_vec);
                 } else if arguments_vec.len() == 1 {
                     println!();
                 }
             }
             "type" => {
                 if arguments_vec.len() >= 2 {
-                    arguments_vec[1..].into_iter().for_each(|e| {
+                    // arguments_vec[1..].into_iter().for_each(|e| {
+                    let argument_vec_copy = arguments_vec.clone();
+                    for (i, e) in argument_vec_copy[1..].iter().enumerate() {
                         let e = e.trim();
                         if e == "exit" {
-                            println!("exit is a shell builtin")
+                            println!("exit is a shell builtin");
+                            arguments_vec.remove(i + 1);
                         } else if e == "echo" {
-                            println!("echo is a shell builtin")
+                            println!("echo is a shell builtin");
+                            arguments_vec.remove(i + 1);
                         } else if e == "type" {
-                            println!("type is a shell builtin")
-                        } else {
-                            // println!("{}: not found", e)
+                            println!("type is a shell builtin");
+                            arguments_vec.remove(i + 1);
                         }
-                    });
+                    }
+                    // });
 
                     let key = "PATH";
                     let mut result_path = String::new();
-                    // let mut this_time_found = false;
                     let mut founded = Vec::new();
                     let mut not_found_bool = Vec::new();
-                    // let mut not_found = Vec::new();
                     match env::var_os(key) {
                         Some(paths) => {
                             arguments_vec[1..].iter().for_each(|file| {
@@ -84,74 +84,34 @@ fn main() -> Result<()> {
                                                 result_path.push_str(path.to_str().unwrap());
                                                 result_path.push_str("\n");
 
-                                                // println!(
-                                                //     "{} is {}",
-                                                //     file.as_str().trim(),
-                                                //     path.to_str().unwrap()
-                                                // );
-                                                // this_time_found = true;
-                                                // println!("{}", this_time_found);
                                                 founded.push(file.as_str().trim());
                                             } else {
-                                                // println!("{} not found", file.as_str().trim());
-                                                // println!("{}", this_time_found);
-                                                // this_time_found = false;
                                             }
                                         }
                                     }
-                                } // down
-
-                                // if this_time_found == false {
-                                //     println!("{} not found-----", file.as_str().trim());
-                                // } else {
-                                //     println!("{}", result_path);
-                                // } ////////
-                                // match result_path.as_str() {
-                                //     "" => println!("{} not found", file.as_str().trim()),
-                                //     _ => println!("{}", result_path),
-                                // }
-                            }); //
+                                }
+                            });
                             arguments_vec[1..].iter().for_each(|file| {
-                                // for (i, e) in founded.iter() {
-                                //     if file.as_str().trim() == e.trim() {
-                                //         // println!("{} not found-----", file.as_str().trim());
-                                //     } else {
-                                //         println!("{} not found-----", file.as_str().trim());
-                                //     }
-                                // }
                                 founded.iter().for_each(|e| {
-                                    // for (i, e) in founded.iter().enumerate() {
                                     if file.as_str().trim() != *e {
                                         not_found_bool.push(true);
-                                        // break;
                                     } else {
                                         not_found_bool.push(false);
                                     }
-                                    // }
                                 });
                                 let truee = not_found_bool.iter().all(|e| *e == true);
                                 if truee == true {
                                     println!("{} not found", file.as_str().trim());
                                 }
                                 not_found_bool.clear();
-                                // let some = founded.iter().filter(|e| file.as_str().trim() != **e);
-                                // println!("{:?}", some);
                             });
-                            // arguments_vec.iter().filter()
 
+                            result_path.remove(result_path.len() - 1);
                             println!("{}", result_path);
-                            // println!("{:?}", arguments_vec);
-                            // println!("{:?}", founded);
-                            // println!("{:?}", not_found_bool);
                         }
 
                         None => println!("{key} is not defined in the environment."),
                     }
-                    // println!("{:?}", result_path);
-                    // match result_path.as_str() {
-                    //     "" => println!("{} not found", arguments_vec[1].trim()),
-                    //     _ => println!("{}", result_path),
-                    // }
                 } else if arguments_vec.len() == 1 {
                     println!();
                 }

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use std::collections::binary_heap;
+// use std::collections::binary_heap;
 use std::env;
 use std::io::BufRead;
 use std::io::{stdin, stdout, Cursor, Write};
@@ -47,47 +47,25 @@ fn main() -> Result<()> {
             }
             "type" => {
                 if arguments_vec.len() >= 2 {
-                    // arguments_vec[1..].into_iter().for_each(|e| {
-                    let argument_vec_copy = arguments_vec.clone();
-                    // for (i, e) in argument_vec_copy[1..].iter().enumerate() {
-                    //     let e = e.trim();
-                    //     if e == "exit" {
-                    //         println!("exit is a shell builtin");
-                    //         arguments_vec.remove(i + 1);
-                    //     } else if e == "echo" {
-                    //         println!("echo is a shell builtin");
-                    //         arguments_vec.remove(i + 1);
-                    //     } else if e == "type" {
-                    //         println!("type is a shell builtin");
-                    //         arguments_vec.remove(i + 1);
-                    //     }
-                    // }
-
-                    // // });
-
                     let key = "PATH";
-                    let mut result_path = String::new();
                     let mut founded = Vec::new();
                     let mut not_found_bool = Vec::new();
-                    for (i, e) in argument_vec_copy[1..].iter().enumerate() {
+                    // for (_i, e) in argument_vec_copy[1..].iter().enumerate() {
+                    arguments_vec[1..].iter().for_each(|e| {
                         let e = e.trim();
                         if e == "exit" {
                             println!("exit is a shell builtin");
-                            // arguments_vec.remove(i + 1);
                             founded.push(e);
                         } else if e == "echo" {
                             println!("echo is a shell builtin");
-                            // arguments_vec.remove(i + 1);
                             founded.push(e);
                         } else if e == "type" {
                             println!("type is a shell builtin");
-                            // arguments_vec.remove(i + 1);
                             founded.push(e);
                         }
 
                         match env::var_os(key) {
                             Some(paths) => {
-                                // arguments_vec[1..].iter().for_each(|e| {
                                 for path in env::split_paths(&paths) {
                                     if path.is_dir() {
                                         for entry in std::fs::read_dir(path).unwrap() {
@@ -96,10 +74,6 @@ fn main() -> Result<()> {
                                             if path.file_name().unwrap().to_str().unwrap()
                                                 == e.trim()
                                             {
-                                                // result_path.push_str(e.as_str().trim());
-                                                // result_path.push_str(" is ");
-                                                // result_path.push_str(path.to_str().unwrap());
-                                                // result_path.push_str("\n");
                                                 println!(
                                                     "{} is {}", // TODO: last element you don't want \n
                                                     e.trim(),
@@ -112,12 +86,6 @@ fn main() -> Result<()> {
                                         }
                                     }
                                 }
-                                // }); // this one
-                                // arguments_vec[1..].iter().for_each(|e| {
-                                // });
-
-                                // result_path.remove(result_path.len() - 1);
-                                // println!("{}", result_path);
                             }
 
                             None => println!("{key} is not defined in the environment."),
@@ -135,7 +103,7 @@ fn main() -> Result<()> {
                             println!("{} not found", e.trim());
                         }
                         not_found_bool.clear();
-                    }
+                    })
                 } else if arguments_vec.len() == 1 {
                     println!();
                 }
@@ -143,7 +111,5 @@ fn main() -> Result<()> {
             "" => println!("Please enter a command"),
             _ => println!("{}: command not found", arguments_vec[0].trim()),
         }
-        // println!("{:?}", arguments_vec[0].trim());
     }
-    // Ok(())
 }

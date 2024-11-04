@@ -70,30 +70,30 @@ fn main() -> Result<()> {
                     let mut not_found_bool = Vec::new();
                     match env::var_os(key) {
                         Some(paths) => {
-                            arguments_vec[1..].iter().for_each(|file| {
+                            arguments_vec[1..].iter().for_each(|e| {
                                 for path in env::split_paths(&paths) {
                                     if path.is_dir() {
                                         for entry in std::fs::read_dir(path).unwrap() {
                                             // let entry = entry?;
                                             let path = entry.as_ref().unwrap().path();
                                             if path.file_name().unwrap().to_str().unwrap()
-                                                == file.as_str().trim()
+                                                == e.as_str().trim()
                                             {
-                                                result_path.push_str(file.as_str().trim());
+                                                result_path.push_str(e.as_str().trim());
                                                 result_path.push_str(" is ");
                                                 result_path.push_str(path.to_str().unwrap());
                                                 result_path.push_str("\n");
 
-                                                founded.push(file.as_str().trim());
+                                                founded.push(e.as_str().trim());
                                             } else {
                                             }
                                         }
                                     }
                                 }
                             });
-                            arguments_vec[1..].iter().for_each(|file| {
-                                founded.iter().for_each(|e| {
-                                    if file.as_str().trim() != *e {
+                            arguments_vec[1..].iter().for_each(|e| {
+                                founded.iter().for_each(|f| {
+                                    if e.as_str().trim() != *f {
                                         not_found_bool.push(true);
                                     } else {
                                         not_found_bool.push(false);
@@ -101,7 +101,7 @@ fn main() -> Result<()> {
                                 });
                                 let truee = not_found_bool.iter().all(|e| *e == true);
                                 if truee == true {
-                                    println!("{} not found", file.as_str().trim());
+                                    println!("{} not found", e.as_str().trim());
                                 }
                                 not_found_bool.clear();
                             });

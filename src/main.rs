@@ -3,6 +3,7 @@ use anyhow::{Context, Result};
 use std::env;
 use std::io::BufRead;
 use std::io::{stdin, stdout, Cursor, Write};
+use std::process::{Command, Stdio};
 
 fn main() -> Result<()> {
     loop {
@@ -100,7 +101,71 @@ fn main() -> Result<()> {
                 }
             }
             "" => println!("Please enter a command"),
-            _ => println!("{}: command not found", arguments_vec[0].trim()),
+            _ => {
+                let key = "PATH";
+                let mut founded: bool = false;
+
+                match env::var_os(key) {
+                    Some(paths) => {
+                        'sub_loop: for path in env::split_paths(&paths) {
+                            if path.is_dir() {
+                                for entry in std::fs::read_dir(path).unwrap() {
+                                    // let entry = entry?;
+                                    let path = entry.as_ref().unwrap().path();
+                                    if path.file_name().unwrap().to_str().unwrap()
+                                        == arguments_vec[0].as_str().trim()
+                                    {
+                                        if arguments_vec.len() > 1 {
+                                            let mut args = String::new();
+                                            // arguments_vec[1..].iter().for_each(|e| {
+                                            for (i, e) in arguments_vec[1..].iter().enumerate() {
+                                                // println!("{:?} oooo", e);
+                                                args.push_str(e);
+                                                if i == arguments_vec[1..].len() - 1 {
+                                                    args.pop();
+                                                    // println!("{:?} eeeeeeeeeeeee", e);
+                                                } else {
+                                                    args.push(' ');
+                                                }
+                                            }
+                                            use std::io::{self, Write};
+                                            use std::process::Command;
+                                            let output = Command::new(path.to_str().unwrap())
+                                                .arg(args)
+                                                .output()
+                                                .expect("failed to execute process");
+
+                                            io::stdout().write_all(&output.stdout).unwrap();
+                                            io::stderr().write_all(&output.stderr).unwrap();
+
+                                            founded = true;
+                                            break 'sub_loop;
+                                        } else {
+                                            use std::io::{self, Write};
+                                            use std::process::Command;
+                                            let output = Command::new(path.to_str().unwrap())
+                                                // .arg("file.txt")
+                                                .output()
+                                                .expect("failed to execute process");
+
+                                            io::stdout().write_all(&output.stdout).unwrap();
+                                            io::stderr().write_all(&output.stderr).unwrap();
+
+                                            founded = true;
+                                            break 'sub_loop;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    None => println!("{key} is not defined in the environment."),
+                }
+                if founded == false {
+                    println!("{}: command not found", arguments_vec[0].as_str().trim());
+                }
+            }
         }
     }
 }

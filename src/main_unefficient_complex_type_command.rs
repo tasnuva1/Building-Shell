@@ -48,53 +48,62 @@ fn main() -> Result<()> {
             "type" => {
                 if arguments_vec.len() >= 2 {
                     let key = "PATH";
-                    let mut founded: bool = false;
-                    // for (_i, e) in arguments_vec[1..].iter().enumerate() {
+                    let mut founded = Vec::new();
+                    let mut not_found_bool = Vec::new();
+                    // for (_i, e) in argument_vec_copy[1..].iter().enumerate() {
                     arguments_vec[1..].iter().for_each(|e| {
                         let e = e.trim();
                         if e == "exit" {
                             println!("exit is a shell builtin");
-                            founded = true;
+                            founded.push(e);
                         } else if e == "echo" {
                             println!("echo is a shell builtin");
-                            founded = true;
+                            founded.push(e);
                         } else if e == "type" {
                             println!("type is a shell builtin");
-                            founded = true;
+                            founded.push(e);
                         }
 
-                        if founded == false {
-                            match env::var_os(key) {
-                                Some(paths) => {
-                                    'sub_loop: for path in env::split_paths(&paths) {
-                                        if path.is_dir() {
-                                            for entry in std::fs::read_dir(path).unwrap() {
-                                                // let entry = entry?;
-                                                let path = entry.as_ref().unwrap().path();
-                                                if path.file_name().unwrap().to_str().unwrap()
-                                                    == e.trim()
-                                                {
-                                                    println!("{} is {}", e, path.to_str().unwrap());
+                        match env::var_os(key) {
+                            Some(paths) => {
+                                for path in env::split_paths(&paths) {
+                                    if path.is_dir() {
+                                        for entry in std::fs::read_dir(path).unwrap() {
+                                            // let entry = entry?;
+                                            let path = entry.as_ref().unwrap().path();
+                                            if path.file_name().unwrap().to_str().unwrap()
+                                                == e.trim()
+                                            {
+                                                println!(
+                                                    "{} is {}",
+                                                    e.trim(),
+                                                    path.to_str().unwrap()
+                                                );
 
-                                                    founded = true;
-                                                    break 'sub_loop;
-                                                } else {
-                                                }
+                                                founded.push(e.trim());
+                                            } else {
                                             }
                                         }
                                     }
                                 }
+                            }
 
-                                None => println!("{key} is not defined in the environment."),
-                            }
-                            if founded == false {
-                                println!("{} not found", e);
-                            }
+                            None => println!("{key} is not defined in the environment."),
                         }
 
-                        founded = false
-                    }) // this one
-                       // }
+                        founded.iter().for_each(|f| {
+                            if e.trim() != *f {
+                                not_found_bool.push(true);
+                            } else {
+                                not_found_bool.push(false);
+                            }
+                        });
+                        let truee = not_found_bool.iter().all(|e| *e == true);
+                        if truee == true {
+                            println!("{} not found", e.trim());
+                        }
+                        not_found_bool.clear();
+                    })
                 } else if arguments_vec.len() == 1 {
                     println!();
                 }
